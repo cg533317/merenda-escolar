@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Merenda Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .login-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: bold;
+        }
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .escola-nome {
+            color: #1e3c72;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="login-card">
+        <img src="{{ url_for('static', filename='images/logo_aquarius.png') }}" alt="Logo Aquarius" class="login-logo">
+        <h3 class="text-center fw-bold mb-1">Merenda Escolar</h3>
+        <p class="text-center text-muted mb-1">Sistema de Controle de Estoque</p>
+        <p class="text-center escola-nome mb-4">🏛️ Aquarius Technology</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Usuário</label>
+                <input type="text" name="usuario" class="form-control" placeholder="Digite seu usuário" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Senha</label>
+                <input type="password" name="senha" class="form-control" placeholder="Digite sua senha" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-login w-100 text-white">🔐 Entrar no Sistema</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">Usuário padrão: <strong>admin</strong> | Senha: <strong>admin</strong></small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Movimentação - Merenda Escolar{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">📥 Registrar Entrada</h5>
+            </div>
+            <div class="card-body">
+                <form action="/movimentacao/entrada" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Produto</label>
+                        <select name="produto_id" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            {% for p in produtos %}
+                            <option value="{{ p[0] }}">{{ p[1] }} (Estoque: {{ p[2] }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" step="0.01" name="quantidade" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nota Fiscal</label>
+                        <input type="text" name="nota_fiscal" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lote</label>
+                        <input type="text" name="lote" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Validade</label>
+                        <input type="text" name="validade" class="form-control" placeholder="DD/MM/AAAA">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">➕ Registrar Entrada</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">📤 Registrar Saída</h5>
+            </div>
+            <div class="card-body">
+                <form action="/movimentacao/saida" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Produto</label>
+                        <select name="produto_id" class="form-select" required>
+                            <option value="">Selecione...</option>
+                            {% for p in produtos %}
+                            <option value="{{ p[0] }}">{{ p[1] }} (Estoque: {{ p[2] }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Escola Destino</label>
+                        <select name="escola_id" class="form-select">
+                            <option value="">Selecione...</option>
+                            {% for e in escolas %}
+                            <option value="{{ e[0] }}">{{ e[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" step="0.01" name="quantidade" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observação</label>
+                        <input type="text" name="observacao" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">➖ Registrar Saída</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

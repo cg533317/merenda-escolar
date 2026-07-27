@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Escolas - Merenda Escolar{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">➕ Cadastrar Escola</h5>
+            </div>
+            <div class="card-body">
+                <form action="/escolas/cadastrar" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Escola</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Endereço</label>
+                        <input type="text" name="endereco" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Diretor</label>
+                        <input type="text" name="diretor" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Responsável pelo Recebimento</label>
+                        <input type="text" name="responsavel" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" name="telefone" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">💾 Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">🏫 Escolas Cadastradas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Endereço</th>
+                                <th>Diretor</th>
+                                <th>Responsável</th>
+                                <th>Telefone</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in escolas %}
+                            <tr>
+                                <td>{{ e[0] }}</td>
+                                <td>{{ e[1] }}</td>
+                                <td>{{ e[2] if e[2] else '-' }}</td>
+                                <td>{{ e[3] if e[3] else '-' }}</td>
+                                <td>{{ e[4] if e[4] else '-' }}</td>
+                                <td>{{ e[5] if e[5] else '-' }}</td>
+                                <td>
+                                    <a href="/escolas/excluir/{{ e[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Excluir {{ e[1] }}?')">🗑️</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

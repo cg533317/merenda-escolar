@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Sobre o Sistema - Merenda Escolar{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3 class="mb-0">📋 Sobre o Sistema</h3>
+            </div>
+            <div class="card-body">
+                
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='images/logo_aquarius.png') }}" alt="Logo Aquarius" style="height: 100px; margin-bottom: 15px;">
+                    <h4 class="fw-bold text-primary">Merenda Escolar</h4>
+                    <p class="text-muted">Sistema de Controle de Estoque</p>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">🎯 Objetivo do Sistema</h5>
+                    <p>O <strong>Merenda Escolar</strong> é um sistema desenvolvido para auxiliar na gestão e controle do estoque de alimentos da merenda escolar da Prefeitura Municipal. O sistema permite o cadastro de produtos, fornecedores e escolas, além de controlar entradas e saídas de mercadorias de forma prática e organizada.</p>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">⚙️ Funcionalidades Principais</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">📦 Cadastro de produtos com validade e lote</li>
+                                <li class="list-group-item">🏭 Cadastro de fornecedores</li>
+                                <li class="list-group-item">🏫 Cadastro de escolas beneficiadas</li>
+                                <li class="list-group-item">🔄 Controle de entradas e saídas de estoque</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">🔔 Alertas de validade e estoque baixo</li>
+                                <li class="list-group-item">📊 Relatórios de estoque e movimentação</li>
+                                <li class="list-group-item">📄 Geração de relatórios em PDF</li>
+                                <li class="list-group-item">🔐 Sistema de login e segurança</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">💻 Tecnologias Utilizadas</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-primary">Python</span>
+                        <span class="badge bg-success">Flask</span>
+                        <span class="badge bg-info">SQLite</span>
+                        <span class="badge bg-warning text-dark">HTML5</span>
+                        <span class="badge bg-danger">CSS3</span>
+                        <span class="badge bg-secondary">Bootstrap 5</span>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">🏫 Instituição de Ensino</h5>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/logo_aquarius.png') }}" alt="Logo Aquarius" style="height: 60px; margin-right: 15px;">
+                                <div>
+                                    <h6 class="fw-bold mb-1">Aquarius Technology</h6>
+                                    <p class="mb-0 text-muted">Escola de Informática e Tecnologia</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">👨‍💻 Desenvolvedor</h5>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <p class="mb-1"><strong>Nome:</strong> Carlos Gomes
+                            <p class="mb-1"><strong>Curso:</strong> Informática / Desenvolvimento de Sistemas</p>
+                            <p class="mb-0"><strong>Instituição:</strong> Aquarius Technology</p>
+                            <p class="mb-0"><strong> CNPJ:</strong> 59.485.044/0001-00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">
+                        <small>📌 Versão do Sistema: <strong>1.0</strong></small><br>
+                        <small>📅 Última atualização: Julho de 2026</small><br>
+                        <small>© 2026 Aquarius Technology - Todos os direitos reservados</small>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

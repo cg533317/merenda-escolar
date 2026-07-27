@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Relatórios - Merenda Escolar{% endblock %}
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">📊 Relatórios do Sistema</h5>
+                <a href="/relatorios/imprimir" target="_blank" class="btn btn-outline-light btn-sm">
+                    🖨️ Imprimir / Salvar PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">📦 Estoque Atual</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th>Estoque</th>
+                                <th>Mínimo</th>
+                                <th>Validade</th>
+                                <th>Fornecedor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in produtos %}
+                            <tr class="{{ 'table-danger' if p[1] <= p[2] else '' }}">
+                                <td>{{ p[0] }}</td>
+                                <td>{{ p[1] }}</td>
+                                <td>{{ p[2] }} {{ p[3] }}</td>
+                                <td>{{ p[4] }}</td>
+                                <td>{{ p[5] if p[5] else '-' }}</td>
+                                <td>{{ p[6] if p[6] else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">📥 Últimas Entradas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Produto</th><th>Qtd</th><th>Data</th><th>NF</th></tr></thead>
+                        <tbody>
+                            {% for e in entradas %}
+                            <tr>
+                                <td>{{ e[1] }}</td>
+                                <td class="text-success fw-bold">+{{ e[2] }}</td>
+                                <td>{{ e[3] }}</td>
+                                <td>{{ e[4] if e[4] else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">📤 Últimas Saídas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Produto</th><th>Qtd</th><th>Data</th><th>Escola</th></tr></thead>
+                        <tbody>
+                            {% for s in saidas %}
+                            <tr>
+                                <td>{{ s[1] }}</td>
+                                <td class="text-danger fw-bold">-{{ s[2] }}</td>
+                                <td>{{ s[3] }}</td>
+                                <td>{{ s[4] if s[4] else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
