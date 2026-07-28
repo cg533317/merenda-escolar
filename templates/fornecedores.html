@@ -1,55 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Produtos - Merenda Escolar{% endblock %}
+{% block title %}Fornecedores - Merenda Escolar{% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">➕ Cadastrar Produto</h5>
+                <h5 class="mb-0">➕ Cadastrar Fornecedor</h5>
             </div>
             <div class="card-body">
-                <form action="/produtos/cadastrar" method="POST">
+                <form action="/fornecedores/cadastrar" method="POST">
                     <div class="mb-3">
-                        <label class="form-label">Nome</label>
-                        <input type="text" name="nome" class="form-control" required>
+                        <label class="form-label">Nome / Razão Social</label>
+                        <input type="text" name="nome" class="form-control" placeholder="Ex: Distribuidora Alimentos Ltda" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Categoria</label>
-                        <input type="text" name="categoria" class="form-control" placeholder="Grãos, Laticínios..." required>
+                        <label class="form-label">CNPJ</label>
+                        <input type="text" name="cnpj" class="form-control" placeholder="00.000.000/0000-00" maxlength="18" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Unidade</label>
-                        <select name="unidade" class="form-select">
-                            <option value="kg">kg</option>
-                            <option value="litro">litro</option>
-                            <option value="pacote">pacote</option>
-                            <option value="caixa">caixa</option>
-                            <option value="unidade">unidade</option>
-                        </select>
+                        <label class="form-label">Telefone</label>
+                        <input type="text" name="telefone" class="form-control" placeholder="(00) 00000-0000" maxlength="15">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Estoque Inicial</label>
-                        <input type="number" step="0.01" name="estoque" class="form-control" required>
+                        <label class="form-label">E-mail</label>
+                        <input type="email" name="email" class="form-control" placeholder="contato@empresa.com.br">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Estoque Mínimo</label>
-                        <input type="number" step="0.01" name="estoque_minimo" class="form-control" required>
+                        <label class="form-label">Endereço</label>
+                        <input type="text" name="endereco" class="form-control" placeholder="Rua, número, bairro, cidade - UF">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Validade</label>
-                        <input type="text" name="validade" class="form-control" placeholder="DD/MM/AAAA">
+                        <label class="form-label">Nome do Contato</label>
+                        <input type="text" name="contato" class="form-control" placeholder="Ex: João Silva">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Lote</label>
-                        <input type="text" name="lote" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Fornecedor</label>
-                        <select name="fornecedor_id" class="form-select">
-                            <option value="">Sem fornecedor</option>
-                            {% for f in fornecedores %}
-                            <option value="{{ f[0] }}">{{ f[1] }}</option>
-                            {% endfor %}
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">💾 Cadastrar</button>
@@ -60,7 +48,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">📦 Produtos Cadastrados</h5>
+                <h5 class="mb-0">🏭 Fornecedores Cadastrados</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -69,26 +57,30 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Nome</th>
-                                <th>Categoria</th>
-                                <th>Estoque</th>
-                                <th>Mínimo</th>
-                                <th>Validade</th>
-                                <th>Fornecedor</th>
+                                <th>CNPJ</th>
+                                <th>Telefone</th>
+                                <th>E-mail</th>
+                                <th>Contato</th>
+                                <th>Status</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for p in produtos %}
-                            <tr class="{{ 'table-danger' if p[4] <= p[5] else '' }}">
-                                <td>{{ p[0] }}</td>
-                                <td>{{ p[1] }}</td>
-                                <td>{{ p[2] }}</td>
-                                <td>{{ p[4] }} {{ p[3] }}</td>
-                                <td>{{ p[5] }}</td>
-                                <td>{{ p[6] if p[6] else '-' }}</td>
-                                <td>{{ p[9] if p[9] else '-' }}</td>
+                            {% for f in fornecedores %}
+                            <tr class="{{ 'table-secondary' if f[6] == 'inativo' else '' }}">
+                                <td>{{ f[0] }}</td>
+                                <td><strong>{{ f[1] }}</strong></td>
+                                <td>{{ f[2] }}</td>
+                                <td>{{ f[3] if f[3] else '-' }}</td>
+                                <td>{{ f[4] if f[4] else '-' }}</td>
+                                <td>{{ f[5] if f[5] else '-' }}</td>
                                 <td>
-                                    <a href="/produtos/excluir/{{ p[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Excluir {{ p[1] }}?')">🗑️</a>
+                                    <span class="badge {{ 'bg-success' if f[6] == 'ativo' else 'bg-secondary' }}">
+                                        {{ 'Ativo' if f[6] == 'ativo' else 'Inativo' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/fornecedores/excluir/{{ f[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Excluir {{ f[1] }}?')">🗑️</a>
                                 </td>
                             </tr>
                             {% endfor %}
