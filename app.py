@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
+import os
 import sqlite3
 from datetime import datetime, timedelta
+
+try:
+    import psycopg2
+    POSTGRES_DISPONIVEL = True
+except ImportError:
+    POSTGRES_DISPONIVEL = False
 
 app = Flask(__name__)
 app.secret_key = "merenda_escolar_2026_segura"
@@ -8,7 +15,17 @@ app.secret_key = "merenda_escolar_2026_segura"
 DB = "database.db"
 
 def conectar():
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url and POSTGRES_DISPONIVEL:
+        return psycopg2.connect(database_url)
     return sqlite3.connect(DB)
+
+def fmt(query):
+    """Adapta placeholders ? (SQLite) para %s (PostgreSQL) quando necessário"""
+    if os.environ.get('DATABASE_URL') and POSTGRES_DISPONIVEL:
+        return query.replace('?', '%s')
+    return query
+
 
 # ============ LOGIN / LOGOUT ============
 
@@ -133,10 +150,10 @@ def cadastrar_produto():
 
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("""
+    cursor.execute(fmt("""
         INSERT INTO produtos (nome, categoria, unidade, estoque, estoque_minimo, validade, lote, fornecedor_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (nome, categoria, unidade, estoque, estoque_minimo, validade, lote, fornecedor_id))
+    """), (nome, categoria, unidade, estoque, estoque_minimo, validade, lote, fornecedor_id))
     conexao.commit()
     conexao.close()
 
@@ -151,7 +168,7 @@ def excluir_produto(id):
 
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("DELETE FROM produtos WHERE id = ?", (id,))
+    cursor.execute(fmt("DELETE FROM produtos WHERE id = ?"), (id,))
     conexao.commit()
     conexao.close()
     flash("🗑️ Produto excluído!", "danger")
@@ -185,10 +202,10 @@ def cadastrar_fornecedor():
 
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("""
+    cursor.execute(fmt("""
         INSERT INTO fornecedores (nome, telefone, email, cnpj)
         VALUES (?, ?, ?, ?)
-    """, (nome, telefone, email, cnpj))
+    """), (nome, telefone, email, cnpj))
     conexao.commit()
     conexao.close()
 
@@ -203,7 +220,7 @@ def excluir_fornecedor(id):
 
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("DELETE FROM fornecedores WHERE id = ?", (id,))
+    cursor.execute(fmt("DELETE FROM fornecedores WHERE id = ?"), (id,))
     conexao.commit()
     conexao.close()
     flash("🗑️ Fornecedor excluído!", "danger")
@@ -238,10 +255,10 @@ def cadastrar_escola():
 
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("""
+    cursor.execute(fmt("""
         INSERT INTO escolas (nome, endereco, diretor, responsavel, telefone)
         VALUES (?, ?, ?, ?, ?)
-    """, (nome, endereco, diretor, responsavel, telefone))
+    """), (nome, endereco, diretor, responsavel, telefone))
     conexao.commit()
     conexao.close()
 
@@ -256,7 +273,7 @@ def excluir_escola(id):
 
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("DELETE FROM escolas WHERE id = ?", (id,))
+    cursor.execute(fmt("DELETE FROM escolas WHERE id = ?"), (id,))
     conexao.commit()
     conexao.close()
     flash("🗑️ Escola excluída!", "danger")
@@ -298,15 +315,15 @@ def registrar_entrada():
     conexao = conectar()
     cursor = conexao.cursor()
 
-    cursor.execute("""
+    cursor.execute(fmt("""
         INSERT INTO entradas (produto_id, quantidade, data, validade, lote, nota_fiscal)
         VALUES (?, ?, ?, ?, ?, ?)
-    """, (produto_id, quantidade, data_hoje, validade, lote, nota_fiscal))
+    """), (produto_id, quantidade, data_hoje, validade, lote, nota_fiscal))
 
-    cursor.execute("SELECT estoque FROM produtos WHERE id = ?", (produto_id,))
+    cursor.execute(fmt("SELECT estoque FROM produtos WHERE id = ?"), (produto_id,))
     estoque_atual = cursor.fetchone()[0]
     novo_estoque = estoque_atual + quantidade
-    cursor.execute("UPDATE produtos SET estoque = ? WHERE id = ?", (novo_estoque, produto_id))
+    cursor.execute(fmt("UPDATE produtos SET estoque = ? WHERE id = ?"), (novo_estoque, produto_id))
 
     conexao.commit()
     conexao.close()
@@ -329,7 +346,7 @@ def registrar_saida():
     conexao = conectar()
     cursor = conexao.cursor()
 
-    cursor.execute("SELECT estoque FROM produtos WHERE id = ?", (produto_id,))
+    cursor.execute(fmt("SELECT estoque FROM produtos WHERE id = ?"), (produto_id,))
     estoque_atual = cursor.fetchone()[0]
 
     if quantidade > estoque_atual:
@@ -337,13 +354,13 @@ def registrar_saida():
         flash("❌ Estoque insuficiente!", "danger")
         return redirect(url_for("movimentacao"))
 
-    cursor.execute("""
+    cursor.execute(fmt("""
         INSERT INTO saidas (produto_id, escola_id, quantidade, data, observacao)
         VALUES (?, ?, ?, ?, ?)
-    """, (produto_id, escola_id, quantidade, data_hoje, observacao))
+    """), (produto_id, escola_id, quantidade, data_hoje, observacao))
 
     novo_estoque = estoque_atual - quantidade
-    cursor.execute("UPDATE produtos SET estoque = ? WHERE id = ?", (novo_estoque, produto_id))
+    cursor.execute(fmt("UPDATE produtos SET estoque = ? WHERE id = ?"), (novo_estoque, produto_id))
 
     conexao.commit()
     conexao.close()
@@ -359,6 +376,7 @@ def sobre():
     if "usuario" not in session:
         return redirect(url_for("login"))
     return render_template("sobre.html")
+
 
 @app.route("/relatorios")
 def relatorios():
@@ -409,7 +427,6 @@ def relatorio_imprimir():
 
     hoje = datetime.now().strftime("%d/%m/%Y")
 
-    # Estoque
     cursor.execute("""
         SELECT p.nome, p.categoria, p.estoque, p.estoque_minimo, p.unidade, p.validade, f.nome
         FROM produtos p
@@ -418,7 +435,6 @@ def relatorio_imprimir():
     """)
     produtos = cursor.fetchall()
 
-    # Entradas
     cursor.execute("""
         SELECT p.nome, e.quantidade, e.data, e.nota_fiscal
         FROM entradas e
@@ -427,7 +443,6 @@ def relatorio_imprimir():
     """)
     entradas = cursor.fetchall()
 
-    # Saídas
     cursor.execute("""
         SELECT p.nome, s.quantidade, s.data, e.nome as escola
         FROM saidas s
