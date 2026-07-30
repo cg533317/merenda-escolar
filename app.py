@@ -26,6 +26,83 @@ def fmt(query):
         return query.replace('?', '%s')
     return query
 
+def criar_tabelas_postgres():
+    """Cria as tabelas automaticamente no PostgreSQL na primeira execução"""
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url or not POSTGRES_DISPONIVEL:
+        return
+
+    try:
+        conexao = psycopg2.connect(database_url)
+        cursor = conexao.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS produtos (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                categoria TEXT,
+                unidade TEXT,
+                estoque NUMERIC DEFAULT 0,
+                estoque_minimo NUMERIC DEFAULT 0,
+                validade TEXT,
+                lote TEXT,
+                fornecedor_id INTEGER
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS fornecedores (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                telefone TEXT,
+                email TEXT,
+                cnpj TEXT
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS escolas (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                endereco TEXT,
+                diretor TEXT,
+                responsavel TEXT,
+                telefone TEXT
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS entradas (
+                id SERIAL PRIMARY KEY,
+                produto_id INTEGER,
+                quantidade NUMERIC,
+                data TEXT,
+                validade TEXT,
+                lote TEXT,
+                nota_fiscal TEXT
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS saidas (
+                id SERIAL PRIMARY KEY,
+                produto_id INTEGER,
+                escola_id INTEGER,
+                quantidade NUMERIC,
+                data TEXT,
+                observacao TEXT
+            )
+        """)
+
+        conexao.commit()
+        conexao.close()
+        print("✅ Tabelas criadas/verificadas no PostgreSQL!")
+    except Exception as e:
+        print(f"⚠️ Erro ao criar tabelas: {e}")
+
+# Cria as tabelas automaticamente na inicialização (só no PostgreSQL)
+criar_tabelas_postgres()
+
 
 # ============ LOGIN / LOGOUT ============
 
