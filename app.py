@@ -463,8 +463,9 @@ def relatorios():
     conexao = conectar()
     cursor = conexao.cursor()
 
+    # ✅ CORRIGIDO: adicionado p.categoria e removido p.unidade (ou ajuste o template)
     cursor.execute("""
-        SELECT p.nome, p.estoque, p.estoque_minimo, p.unidade, p.validade, f.nome
+        SELECT p.nome, p.categoria, p.estoque, p.estoque_minimo, p.validade, f.nome
         FROM produtos p
         LEFT JOIN fornecedores f ON p.fornecedor_id = f.id
         ORDER BY p.nome
