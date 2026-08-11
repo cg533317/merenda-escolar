@@ -23,30 +23,30 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Produto</th>
-                                <th>Categoria</th>
-                                <th>Estoque</th>
-                                <th>Mínimo</th>
-                                <th>Validade</th>
-                                <th>Fornecedor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for p in produtos %}
-                            <tr class="{{ 'table-danger' if p[1] <= p[2] else '' }}">
-                                <td>{{ p[0] }}</td>
-                                <td>{{ p[1] }}</td>
-                                <td>{{ p[2] }} {{ p[3] }}</td>
-                                <td>{{ p[4] }}</td>
-                                <td>{{ p[5] if p[5] else '-' }}</td>
-                                <td>{{ p[6] if p[6] else '-' }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <table class="table table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Produto</th>
+      <th>Categoria</th>
+      <th>Estoque</th>
+      <th>Mínimo</th>
+      <th>Validade</th>
+      <th>Fornecedor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in produtos %}
+    <tr>
+      <td>{{ p[0] }}</td>      <!-- nome -->
+      <td>{{ p[1] }}</td>      <!-- categoria -->
+      <td>{{ p[2] }}</td>      <!-- estoque -->
+      <td>{{ p[3] }}</td>      <!-- estoque_minimo -->
+      <td>{{ p[4] if p[4] else 'None' }}</td>  <!-- validade -->
+      <td>{{ p[5] if p[5] else '-' }}</td>     <!-- fornecedor -->
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>       </table>
                 </div>
             </div>
         </div>
