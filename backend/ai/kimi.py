@@ -1,5 +1,6 @@
 ﻿from backend.ai.base import AIProvider
 from backend.ai.kimi_client import KimiClient
+from backend.ai.kimi_errors import KimiAPIError
 from backend.config import Config
 
 
@@ -15,7 +16,7 @@ class KimiProvider(AIProvider):
         """Envia um prompt para o Kimi e retorna a resposta."""
 
         if not self.api_key:
-            raise ValueError("KIMI_API_KEY não configurada.")
+            raise KimiAPIError("KIMI_API_KEY não configurada.")
 
         return self.client.chat(
             model=self.model,

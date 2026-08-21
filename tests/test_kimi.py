@@ -1,5 +1,8 @@
-﻿from backend.ai.base import AIProvider
+﻿import pytest
+
+from backend.ai.base import AIProvider
 from backend.ai.kimi import KimiProvider
+from backend.ai.kimi_errors import KimiAPIError
 
 
 class FakeKimiClient:
@@ -34,14 +37,11 @@ def test_kimi_provider_accepts_custom_model():
 def test_kimi_provider_requires_api_key():
     provider = KimiProvider(api_key="")
 
-    assert provider.api_key == ""
-
-    try:
+    with pytest.raises(
+        KimiAPIError,
+        match="KIMI_API_KEY não configurada"
+    ):
         provider.generate("Olá AquaBot")
-    except ValueError as error:
-        assert str(error) == "KIMI_API_KEY não configurada."
-    else:
-        raise AssertionError("Era esperado ValueError")
 
 
 def test_kimi_provider_uses_kimi_client():
