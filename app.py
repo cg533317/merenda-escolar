@@ -599,5 +599,39 @@ def relatorio_pdf():
         return redirect(url_for("relatorios"))
 
 
+
+# ============ DIAGNÓSTICO TEMPORÁRIO (REMOVER APÓS USO) ============
+@app.route("/diagnostico")
+def diagnostico():
+    senha = request.args.get("senha", "")
+    if senha != "diagn0st1c0_m3r3nd4":
+        return "<h1>🔒 Acesso negado</h1>", 403
+    
+    conexao = conectar()
+    cursor = conexao.cursor()
+    db_type = "PostgreSQL" if os.environ.get('DATABASE_URL') and POSTGRES_DISPONIVEL else "SQLite"
+    
+    html = [f"<h1>📊 Diagnóstico - {db_type}</h1><p>Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</p><hr>"]
+    
+    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name")
+    for t in cursor.fetchall():
+        nome = t[0]
+        cursor.execute(f'SELECT COUNT(*) FROM "{nome}"')
+        count = cursor.fetchone()[0]
+        html.append(f"<p><b>{nome}</b>: {count} registros</p>")
+    
+    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name")
+    for t in cursor.fetchall():
+        nome = t[0]
+        cursor.execute(f'SELECT * FROM "{nome}" LIMIT 3')
+        rows = cursor.fetchall()
+        if rows:
+            html.append(f"<h3>{nome}</h3><pre>{chr(10).join([str(r) for r in rows])}</pre>")
+    
+    conexao.close()
+    html.append("<hr><p style='color:red'><b>⚠️ REMOVER ESTE ENDPOINT APÓS USO!</b></p>")
+    return "\n".join(html)
+# ============ FIM DO DIAGNÓSTICO ============
+
 if __name__ == "__main__":
     app.run(debug=True)
