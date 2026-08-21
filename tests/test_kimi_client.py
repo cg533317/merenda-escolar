@@ -1,6 +1,7 @@
 ﻿import pytest
 
 from backend.ai.kimi_client import KimiClient
+from backend.ai.kimi_errors import KimiAPIError
 
 
 class FakeResponse:
@@ -22,7 +23,7 @@ class FakeResponse:
 def test_kimi_client_requires_api_key():
     client = KimiClient(api_key="")
 
-    with pytest.raises(ValueError, match="KIMI_API_KEY não configurada"):
+    with pytest.raises(KimiAPIError, match="KIMI_API_KEY não configurada"):
         client.chat(
             model="kimi-k2.6",
             prompt="Olá AquaBot"
@@ -72,3 +73,51 @@ def test_kimi_client_chat(monkeypatch):
     ]
 
     assert captured["timeout"] == 60
+
+
+def test_kimi_client_converts_http_error_to_kimi_error(monkeypatch):
+    client = KimiClient(api_key="chave-de-teste")
+
+    def fake_post(*args, **kwargs):
+        raise __import__("requests").RequestException(
+            "erro simulado"
+        )
+
+    monkeypatch.setattr(
+        "backend.ai.kimi_client.requests.post",
+        fake_post
+    )
+
+    with pytest.raises(
+        KimiAPIError,
+        match="Erro na comunicação com a API do Kimi"
+    ):
+        client.chat(
+            model="kimi-k2.6",
+            prompt="Olá AquaBot"
+        )
+
+
+def test_kimi_client_rejects_invalid_response(monkeypatch):
+    client = KimiClient(api_key="chave-de-teste")
+
+    class InvalidResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {}
+
+    monkeypatch.setattr(
+        "backend.ai.kimi_client.requests.post",
+        lambda *args, **kwargs: InvalidResponse()
+    )
+
+    with pytest.raises(
+        KimiAPIError,
+        match="Resposta inválida recebida da API do Kimi"
+    ):
+        client.chat(
+            model="kimi-k2.6",
+            prompt="Olá AquaBot"
+        )
