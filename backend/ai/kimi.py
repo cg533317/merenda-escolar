@@ -7,8 +7,9 @@ from backend.config import Config
 class KimiProvider(AIProvider):
     """Provedor de inteligência artificial baseado na API do Kimi."""
 
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, model=None):
         self.api_key = api_key or Config.KIMI_API_KEY
+        self.model = model or Config.KIMI_MODEL
 
     def generate(self, prompt: str) -> str:
         """Envia um prompt para o Kimi e retorna a resposta."""

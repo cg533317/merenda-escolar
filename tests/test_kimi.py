@@ -9,6 +9,16 @@ def test_kimi_provider_implements_ai_provider():
 
     assert isinstance(provider, AIProvider)
     assert provider.api_key == "chave-de-teste"
+    assert provider.model == "kimi-k2.6"
+
+
+def test_kimi_provider_accepts_custom_model():
+    provider = KimiProvider(
+        api_key="chave-de-teste",
+        model="modelo-de-teste"
+    )
+
+    assert provider.model == "modelo-de-teste"
 
 
 def test_kimi_provider_requires_api_key():
