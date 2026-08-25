@@ -1,4 +1,5 @@
-﻿from backend.ai.base import AIProvider
+﻿from typing import Dict, Any
+from backend.ai.base import AIProvider
 from backend.ai.kimi_client import KimiClient
 from backend.ai.kimi_errors import KimiAPIError
 from backend.config import Config
@@ -22,3 +23,11 @@ class KimiProvider(AIProvider):
             model=self.model,
             prompt=prompt
         )
+
+    def metadata(self) -> Dict[str, Any]:
+        """Retorna metadados específicos do KimiProvider."""
+        return {
+            "provider": "KimiProvider",
+            "model": self.model,
+            "api_configured": bool(self.api_key),
+        }

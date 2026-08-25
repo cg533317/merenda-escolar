@@ -16,6 +16,8 @@ class Config:
 
     SECRET_KEY = os.getenv("SECRET_KEY", "")
 
+    AI_PROVIDER = os.getenv("AI_PROVIDER", "kimi")
+
     KIMI_API_KEY = os.getenv("KIMI_API_KEY", "")
     KIMI_MODEL = os.getenv("KIMI_MODEL", "kimi-k2.6")
 

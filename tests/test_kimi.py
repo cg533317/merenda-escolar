@@ -58,3 +58,13 @@ def test_kimi_provider_uses_kimi_client():
     assert result == "Resposta simulada do Kimi"
     assert fake_client.model == "kimi-k2.6"
     assert fake_client.prompt == "Olá AquaBot"
+
+
+def test_kimi_provider_metadata():
+    provider = KimiProvider(api_key="test-key", model="test-model")
+    
+    metadata = provider.metadata()
+    
+    assert metadata["provider"] == "KimiProvider"
+    assert metadata["model"] == "test-model"
+    assert metadata["api_configured"] is True
