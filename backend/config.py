@@ -21,6 +21,8 @@ class Config:
     KIMI_API_KEY = os.getenv("KIMI_API_KEY", "")
     KIMI_MODEL = os.getenv("KIMI_MODEL", "kimi-k2.6")
 
+    CHAT_MAX_MESSAGE_LENGTH = int(os.getenv("CHAT_MAX_MESSAGE_LENGTH", "10000"))
+
     OTHER_AI_API_KEY = os.getenv("OTHER_AI_API_KEY", "")
 
     DATABASE_URL = os.getenv("DATABASE_URL", "")

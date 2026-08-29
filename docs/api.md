@@ -1,7 +1,7 @@
 # AQUABOT - DOCUMENTAÇÃO DA API
 
-**Versão:** 1.1  
-**Status:** Infraestrutura de AI Providers  
+**Versão:** 1.2  
+**Status:** Runtime Integration + Chat API  
 **Data:** 24/08/2026
 
 ---
@@ -67,29 +67,61 @@ print(data)  # {'status': 'ok', 'app': 'AquaBot'}
 
 ### 3.1 Chat
 
-**Endpoint:** `POST /api/chat` (planejado)
+**Endpoint:** `POST /api/chat`
 
 **Descrição:** Envia uma mensagem para o AquaBot e recebe uma resposta.
 
-**Status:** ❌ Não implementado (FASE 3)
+**Status:** ✅ Implementado (FASE 3.0)
 
-**Request Body (planejado):**
+**Request Body:**
 
 ```json
 {
   "message": "Olá, como você está?",
-  "conversation_id": "optional-uuid"
+  "model": "kimi-k2.6"
 }
 ```
 
-**Response (planejado):**
+**Parâmetros:**
+- `message` (obrigatório): String com a mensagem do usuário. Máximo 10.000 caracteres.
+- `model` (opcional): String com o modelo a ser usado. Se não fornecido, usa o valor de `KIMI_MODEL`. Se fornecido, deve ser exatamente igual ao modelo configurado.
+
+**Response de Sucesso:**
 
 ```json
 {
   "response": "Olá! Estou bem, obrigado. Como posso ajudar você hoje?",
-  "conversation_id": "uuid",
+  "provider": "KimiProvider",
+  "model": "kimi-k2.6",
   "timestamp": "2026-08-24T23:00:00Z"
 }
+```
+
+**Códigos de Status:**
+- `200 OK` - Requisição bem-sucedida
+- `400 Bad Request` - Erro de validação (message ausente, vazio, muito longo, ou model inválido)
+- `500 Internal Server Error` - Erro interno ou configuração ausente
+- `502 Bad Gateway` - Erro do provedor de IA
+
+**Exemplo de Requisição:**
+
+```bash
+curl -X POST http://127.0.0.1:5000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Olá AquaBot"}'
+```
+
+**Exemplo em Python:**
+
+```python
+import requests
+
+response = requests.post(
+    "http://127.0.0.1:5000/api/chat",
+    json={"message": "Olá AquaBot"}
+)
+data = response.json()
+print(data["response"])
 ```
 
 ### 3.2 Conversations
@@ -197,59 +229,55 @@ print(data)  # {'status': 'ok', 'app': 'AquaBot'}
 
 ### 4.3 Respostas de Erro do Servidor
 
-- `500 Internal Server Error` - Erro interno do servidor
-- `502 Bad Gateway` - Gateway inválido
-- `503 Service Unavailable` - Serviço indisponível
-- `504 Gateway Timeout` - Timeout do gateway
+- `500 Internal Server Error` - Erro interno do servidor ou configuração ausente
+- `502 Bad Gateway` - Erro do provedor de IA
+- `503 Service Unavailable` - Serviço indisponível (não implementado)
+- `504 Gateway Timeout` - Timeout do gateway (não implementado)
 
 ---
 
 ## 5. FORMATO DE ERROS
 
-### 5.1 Estrutura de Erro
+### 5.1 Estrutura de Erro (FASE 3.0)
 
 ```json
 {
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Descrição do erro",
-    "details": "Detalhes adicionais (opcional)"
-  }
+  "error": "error_type",
+  "message": "Descrição do erro"
 }
 ```
+
+**Tipos de erro:**
+- `validation_error` - Erro de validação de entrada
+- `internal_error` - Erro interno do servidor
+- `provider_error` - Erro do provedor de IA
 
 ### 5.2 Exemplos de Erro
 
-**400 Bad Request:**
+**400 Bad Request (validation_error):**
 
 ```json
 {
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "O campo 'message' é obrigatório"
-  }
+  "error": "validation_error",
+  "message": "O campo 'message' é obrigatório."
 }
 ```
 
-**401 Unauthorized:**
+**500 Internal Server Error (internal_error):**
 
 ```json
 {
-  "error": {
-    "code": "UNAUTHORIZED",
-    "message": "Token de autenticação inválido"
-  }
+  "error": "internal_error",
+  "message": "Erro interno do servidor."
 }
 ```
 
-**500 Internal Server Error:**
+**502 Bad Gateway (provider_error):**
 
 ```json
 {
-  "error": {
-    "code": "INTERNAL_ERROR",
-    "message": "Erro interno do servidor"
-  }
+  "error": "provider_error",
+  "message": "Não foi possível obter resposta do provedor de IA."
 }
 ```
 
@@ -519,7 +547,42 @@ fetch('http://127.0.0.1:5000/api/chat', {
 
 ## 16. MUDANÇAS RECENTES
 
-### 16.1 Versão 1.0 (24/08/2026)
+### 16.1 Versão 1.2 (24/08/2026) - FASE 3.0
+
+**Adicionado:**
+- Endpoint `POST /api/chat`
+- Configuração `CHAT_MAX_MESSAGE_LENGTH`
+- ChatService (backend/services/chat_service.py)
+- Rota /api/chat (backend/routes/chat.py)
+- Testes do ChatService (tests/test_chat_service.py)
+- Testes da rota (tests/test_chat_route.py)
+- Composition root em app.py
+- Tratamento de erros (400, 500, 502)
+- Timestamp em respostas
+
+**Alterado:**
+- backend/app.py - Implementado composition root
+- backend/config.py - Adicionado CHAT_MAX_MESSAGE_LENGTH
+- .env.example - Adicionado CHAT_MAX_MESSAGE_LENGTH
+
+**Removido:**
+- Nenhuma remoção
+
+### 16.2 Versão 1.1 (24/08/2026) - FASE 2.0
+
+**Adicionado:**
+- ProviderFactory
+- Metadata de providers
+- Integração Factory + AIService
+- Testes de Factory
+
+**Alterado:**
+- Nenhuma alteração
+
+**Removido:**
+- Nenhuma remoção
+
+### 16.3 Versão 1.0 (24/08/2026) - FASE 1.0
 
 **Adicionado:**
 - Endpoint `GET /health`
@@ -590,6 +653,6 @@ Para problemas ou dúvidas sobre a API, consulte:
 
 **Projeto:** AquaBot  
 **Documento:** API Documentation  
-**Versão:** 1.0  
-**Status:** Fundação Estabilizada  
+**Versão:** 1.2  
+**Status:** Runtime Integration + Chat API  
 **Data:** 24/08/2026

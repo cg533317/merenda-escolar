@@ -6,7 +6,7 @@
 **Responsável pelo projeto:** Carlos Gomes  
 **Status:** Em desenvolvimento ativo  
 **Documento:** Master Technical Specification  
-**Versão:** 1.0  
+**Versão:** 1.1  
 **Data:** 24/08/2026
 
 ---
@@ -570,6 +570,13 @@ A **FASE 2.0** foi posteriormente executada e apresentou:
 - 0 failed
 - 100%
 
+A **FASE 3.0** foi posteriormente executada e apresentou:
+
+- 56 testes
+- 56 passed
+- 0 failed
+- 100%
+
 O agente deve **confirmar** esses números no estado atual do repositório.  
 Não assumir que os números continuam válidos sem executar os testes.
 
@@ -632,28 +639,33 @@ Não assumir que os números continuam válidos sem executar os testes.
 
 ---
 
-## 24. FASE 3.0 — CHAT CORE
+## 24. FASE 3.0 — RUNTIME INTEGRATION + CHAT API
 
-**Status:** `PLANEJADA`
+**Status:** `CONCLUÍDA`
 
-**NÃO** implementar sem autorização.
+**Objetivo:**
+Integrar a infraestrutura de IA ao runtime Flask através de um composition root adequado, criando o endpoint `/api/chat`.
 
-**Objetivo futuro:**
-Criar o núcleo conversacional do AquaBot.
+**Resultado:**
+- 56/56 testes
+- 100%
 
-**Arquitetura prevista:**
+**Validação realizada:**
+- Git
+- testes em ambiente adequado
+- composition root implementado
+- tratamento de erros (400, 500, 502)
+- logging seguro
+- ChatService independente de Flask
+- timestamp na camada HTTP
+
+**Arquitetura implementada:**
 
 ```
-/api/chat
+POST /api/chat
      │
      ▼
 ChatService
-     │
-     ▼
-Mensagem
-     │
-     ▼
-Contexto
      │
      ▼
 AIService
@@ -665,15 +677,17 @@ ProviderFactory
 KimiProvider
 ```
 
-**Possíveis componentes:**
+**Componentes criados:**
+- backend/services/chat_service.py
+- backend/routes/chat.py
+- tests/test_chat_service.py
+- tests/test_chat_route.py
 
-```
-backend/chat/
-backend/services/chat_service.py
-backend/models/message.py
-```
-
-Os nomes definitivos devem ser definidos somente após análise do código existente.
+**Componentes modificados:**
+- backend/app.py (composition root)
+- backend/config.py (CHAT_MAX_MESSAGE_LENGTH)
+- .env.example (CHAT_MAX_MESSAGE_LENGTH)
+- docs/api.md
 
 ---
 
