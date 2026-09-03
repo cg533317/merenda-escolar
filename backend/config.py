@@ -26,3 +26,7 @@ class Config:
     OTHER_AI_API_KEY = os.getenv("OTHER_AI_API_KEY", "")
 
     DATABASE_URL = os.getenv("DATABASE_URL", "")
+
+    TECHNICAL_USERNAME = os.getenv("TECHNICAL_USERNAME", "tech-user")
+    TECHNICAL_DISPLAY_NAME = os.getenv("TECHNICAL_DISPLAY_NAME", "Usuário Técnico")
+    CONTEXT_HISTORY_MESSAGES = int(os.getenv("CONTEXT_HISTORY_MESSAGES", "10"))

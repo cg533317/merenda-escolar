@@ -5,6 +5,13 @@ from backend.routes.health import health_bp
 from backend.ai.factory import ProviderFactory, ProviderFactoryError
 from backend.services.ai_service import AIService
 from backend.services.chat_service import ChatService
+from backend.services.context_policy import MostRecentContextPolicy
+from backend.services.identity import TechnicalIdentityProvider
+from backend.services.persistence import (
+    create_db_engine,
+    create_session_factory,
+    init_db,
+)
 from backend.routes.chat import create_chat_bp
 
 
@@ -21,7 +28,19 @@ def create_app():
     try:
         provider = ProviderFactory.create()
         ai_service = AIService(provider)
-        chat_service = ChatService(ai_service)
+        db_engine = create_db_engine()
+        init_db(db_engine)
+        session_factory = create_session_factory(db_engine)
+        identity_provider = TechnicalIdentityProvider()
+        context_policy = MostRecentContextPolicy(
+            max_messages=Config.CONTEXT_HISTORY_MESSAGES,
+        )
+        chat_service = ChatService(
+            ai_service,
+            session_factory=session_factory,
+            identity_provider=identity_provider,
+            context_policy=context_policy,
+        )
     except Exception as e:
         # Armazena erro mas permite que app inicie
         initialization_error = str(e)

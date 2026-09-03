@@ -171,6 +171,29 @@ class ConversationRepository:
             conversation_id,
         )
 
+    def get_by_id_for_user(
+        self,
+        conversation_id: UUID,
+        user_id: UUID,
+    ) -> Conversation | None:
+        """
+        Recupera uma Conversation somente se pertencer ao usuário.
+
+        Simula o conceito de `conversation.user_id == user_id`. A consulta
+        é feita pela identidade do usuário, de modo que um usuário não
+        consiga acessar conversa de terceiros — o retorno é None tanto
+        para conversa inexistente quanto para conversa de outro usuário.
+        """
+        statement = (
+            select(Conversation)
+            .where(
+                Conversation.id == conversation_id,
+                Conversation.user_id == user_id,
+            )
+        )
+
+        return self.session.scalar(statement)
+
     def list_by_user(
         self,
         user_id: UUID,
