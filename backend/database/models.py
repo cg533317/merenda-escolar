@@ -271,3 +271,131 @@ class Message(Base):
         ),
         Index("ix_messages_conversation_id", "conversation_id"),
     )
+
+
+class Memory(Base):
+    """Memória persistente do AquaBot."""
+
+    __tablename__ = "memories"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    conversation_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("conversations.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+
+    scope: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+    )
+
+    origin: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="active",
+    )
+
+    category: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    supersedes_memory_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("memories.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+
+    content: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    metadata_: Mapped[dict[str, Any] | None] = mapped_column(
+        "metadata",
+        JSON,
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        nullable=False,
+        default=utc_now,
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    expires_at: Mapped[datetime | None] = mapped_column(
+        nullable=True,
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "scope IN ('user', 'conversation')",
+            name="ck_memories_scope",
+        ),
+        CheckConstraint(
+            "origin IN ('user_confirmed', 'system_created', 'imported')",
+            name="ck_memories_origin",
+        ),
+        CheckConstraint(
+            "status IN ('active', 'superseded', 'archived')",
+            name="ck_memories_status",
+        ),
+        CheckConstraint(
+            """
+            (
+                scope = 'user'
+                AND conversation_id IS NULL
+            )
+            OR
+            (
+                scope = 'conversation'
+                AND conversation_id IS NOT NULL
+            )
+            """,
+            name="ck_memories_scope_conversation",
+        ),
+        CheckConstraint(
+            "length(trim(content)) > 0",
+            name="ck_memories_content_not_blank",
+        ),
+        CheckConstraint(
+            "supersedes_memory_id IS NULL OR supersedes_memory_id != id",
+            name="ck_memories_not_self_superseded",
+        ),
+        Index(
+            "ix_memories_owner_user_id",
+            "owner_user_id",
+        ),
+        Index(
+            "ix_memories_conversation_id",
+            "conversation_id",
+        ),
+        Index(
+            "ix_memories_owner_scope_status",
+            "owner_user_id",
+            "scope",
+            "status",
+        ),
+    )

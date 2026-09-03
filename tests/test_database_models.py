@@ -24,6 +24,7 @@ def test_models_are_registered():
         "sessions",
         "conversations",
         "messages",
+        "memories",
     }
 
 
